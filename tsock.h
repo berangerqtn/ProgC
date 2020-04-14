@@ -24,6 +24,41 @@ void printbuffer(int n);
 //-------------Définitions des fonctions-------------
 //---------------------------------------------------
 
+//-------------PRINTBUFFER
+void printbuffer(int n)
+{
+    int r;
+
+    if (n<10)
+    {
+        printf("[----%d",n);
+    }
+    if (n>=10 & n<100)
+    {
+        printf("[---%d",n);
+    }
+    if (n>=100 & n<1000)
+    {
+        printf("[--%d",n);
+    }
+    if (n>=1000 & n<10000)
+    {
+        printf("[--%d",n);
+    }
+    if (n>=10000 & n<100000)
+    {
+        printf("[-%d",n);
+    }
+    if (n>=100000 & n<1000000)
+    {
+        printf("[%d",n);
+    }
+    if (n>=1000000)
+    {
+        printf("Trop de messages à envoyer (n>1000000 \n");
+        exit(1);
+    }
+}
 //Construction des messages
 
 void construire_message(char *message, char motif, int lg ,int i)
@@ -31,13 +66,11 @@ void construire_message(char *message, char motif, int lg ,int i)
 {
 	char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
 	if (i>26)
-	{
-		motif=alphabet[i%26-1];
-	}
+	    motif=alphabet[i%26-1];
+
 	else
-	{
-		motif=alphabet[i-1];
-	}
+	    motif = alphabet[i - 1];
+
 
   	for (int j=0;j<lg-5;j++)
     {
@@ -62,40 +95,7 @@ void afficher_message(char *message, int lg)
     }
   	printf("]\n");
 }
-void printbuffer(int n)
-{
-	int r;
-	
-	if (n<10)
-	{	
-		printf("[----%d",n);
-	}
-	if (n>=10 & n<100)
-	{	
-		printf("[---%d",n);
-	}
-	if (n>=100 & n<1000)
-	{	
-		printf("[--%d",n);
-	}
-	if (n>=1000 & n<10000)
-	{	
-		printf("[--%d",n);
-	}
-	if (n>=10000 & n<100000)
-	{	
-		printf("[-%d",n);
-	}
-	if (n>=100000 & n<1000000)
-	{	
-		printf("[%d",n);
-	}
-	if (n>=1000000)
-	{
-		printf("Trop de messages à envoyer (n>1000000 \n");
-		exit(1);
-	}
-}
+
 
 //----------------------------------------------------
 //----------------Envoi UDP---------------------------
@@ -284,12 +284,12 @@ void ClientTCP (int port, int nb_message , int lg_msg , char* dest)
 		
 		construire_message(message,motif,lg_msg,i);
 
-//		printbuffer(i);
+		printbuffer(i);
 		afficher_message(message,lg_msg);
 
 		//Envoi du message 
 
-		if ((envoi=sendto(sock,message,lg_msg,0,(struct sockaddr*)&addr_distant,lg_addr_distant))==-1)
+		if ((envoi=write(sock,message,lg_msg/*,0,(struct sockaddr*)&addr_distant,lg_addr_distant)*/))==-1)
 		{
 			printf("Echec de l'envoi du message (fonction send en défaut)\n");
 			exit(1);
@@ -396,7 +396,7 @@ void ServeurTCP(int port , int nb_message, int lg_msg)
 			printf("Echec de la lecture du message entrant \n");
 			exit(1);
 		}
-//		printbuffer(i);
+		printbuffer(i);
 		afficher_message(message, lg_recv);
 	}
 	//Fermeture connexion
