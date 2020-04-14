@@ -79,6 +79,11 @@ void main (int argc, char **argv)
 
     		case 'n':
       			nb_message = atoi(optarg);
+            if (nb_message>100000)
+            {
+              printf("Trop d'envois, n> 100 000\n");
+              exit (1);
+            }
       		break;	
 
     		case 'u':

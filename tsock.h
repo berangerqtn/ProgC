@@ -34,6 +34,8 @@ void construire_message2(char *message, char motif, int lg, int i)
     char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
     if (i>26)
         motif=alphabet[i%26-1];
+    else if (i=26)
+    	motif='z';
 
     else
         motif = alphabet[i - 1];
@@ -83,43 +85,97 @@ void printbuffer(int n)
 //------------------PRINTBUFFER2----------------------
 void printbuffer2(int n , char*message)
 {
+	if (n>=100000)
+    {
+        printf("Trop de messages à envoyer (n>1000000 \n");
+        exit(1);
+    }
+
     if (n<10)
     {
         for (int i=0 ; i<4 ; i++)
         {
             *(message+i)='-';
         }
-        *(message+4)=n;
+        //char nb[1];      
+        *(message+4)= n + '0';
     }
     if (n>=10 & n<100)
     {
+    	char nb[2];
+
         for (int i=0 ; i<3 ; i++)
         {
             *(message+i)='-';
         }
-        *(message+3)=n;
+        sprintf(nb,"%d",n);
+        *(message+3)=*nb;
+        n=n%10;
+        sprintf(nb,"%d", n);
+        *(message+4)=*nb;
     }
     if (n>=100 & n<1000)
     {
-        printf("[--%d",n);
+        char nb[3];
+        for (int i=0 ; i<2 ; i++)
+        {
+            *(message+i)='-';
+        }
+        sprintf(nb,"%d",n);
+        *(message+2)=*nb;
+        n=n%100;
+        sprintf(nb,"%d", n);
+        *(message+3)=*nb;
+        n=n%10;
+        sprintf(nb,"%d", n);
+        *(message+4)=*nb;
     }
     if (n>=1000 & n<10000)
     {
-        printf("[--%d",n);
+    	int j=1000;
+
+        char nb[4];
+        for (int i=0 ; i<2 ; i++)
+        {
+            *(message+i)='-';
+        }
+
+        sprintf(nb,"%d",n);
+        *(message+1)=*nb;
+        n=n%1000;
+        sprintf(nb,"%d", n);
+        *(message+2)=*nb;
+        n=n%100;
+        sprintf(nb,"%d", n);
+        *(message+3)=*nb;
+        n=n%10;
+        sprintf(nb,"%d", n);
+        *(message+4)=*nb;
     }
     if (n>=10000 & n<100000)
     {
-        printf("[-%d",n);
+        char nb[4];
+        for (int i=0 ; i<2 ; i++)
+        {
+            *(message+i)='-';
+        }
+        sprintf(nb,"%d",n);
+        *(message)=*nb;
+        n=n%10000;
+        sprintf(nb,"%d", n);
+        *(message+1)=*nb;
+        n=n%1000;
+        sprintf(nb,"%d", n);
+        *(message+2)=*nb;
+        n=n%100;
+        sprintf(nb,"%d", n);
+        *(message+3)=*nb;
+        n=n%10;
+        sprintf(nb,"%d", n);
+        *(message+4)=*nb;
     }
-    if (n>=100000 & n<1000000)
-    {
-        printf("[%d",n);
-    }
-    if (n>=1000000)
-    {
-        printf("Trop de messages à envoyer (n>1000000 \n");
-        exit(1);
-    }
+    
+    
 }
 
 //Construction des messages
@@ -273,7 +329,6 @@ void reception_UDP(int port, int nb_message, int lg_message)
     	else 
 		{
 	 		printf("PUITS : Réception n°%d (%d) :",i,lg_message);
-	 		//printbuffer(i);
 	  		afficher_message(message,recv);
 		}
     }
@@ -342,12 +397,12 @@ void ClientTCP (int port, int nb_message , int lg_msg , char* dest)
 
 	for (int i=1; i<=nb_message;i++)
 	{
-		printf("SOURCE : envoi n°%d (%d) ", i,lg_msg);
+		printf("SOURCE : envoi n°%d (%d) [", i,lg_msg);
 		//Création du message 
 		
 		construire_message(message,motif,lg_msg,i);
 
-		printbuffer(i);
+		printbuffer2(i,message);
 		afficher_message(message,lg_msg);
 
 		//Envoi du message 
@@ -453,13 +508,12 @@ void ServeurTCP(int port , int nb_message, int lg_msg)
 
 	for (int i=1;i<=nb_message;i++)
 	{
-		printf("PUITS : Réception n°%d (%d) " , i , lg_msg);
+		printf("PUITS : Réception n°%d (%d) [" , i , lg_msg);
 		if((lg_recv=read(sock2,message, lg_msg))<0)
 		{
 			printf("Echec de la lecture du message entrant \n");
 			exit(1);
 		}
-		printbuffer(i);
 		afficher_message(message, lg_recv);
 	}
 	//Fermeture connexion
