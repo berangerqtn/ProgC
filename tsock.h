@@ -11,12 +11,15 @@
 //---------------------------------------------------
 
 void construire_message(char *message, char motif, int lg, int i);
+void construire_message2(char *message, char motif, int lg, int i);
 void afficher_message(char *message, int lg);
 void envoi_UDP(int port, int nb_message  , int lg_msg, char*dest);
 void reception_UDP(int port, int nb_message , int lg_message);
 void ClientTCP (int port, int nb_message , int lg_msg, char* dest);
 void ServeurTCP(int port , int nb_message, int lg_msg);
 void printbuffer(int n);
+void printbuffer2(int n , char*message);
+
 
 
 
@@ -24,11 +27,27 @@ void printbuffer(int n);
 //-------------Définitions des fonctions-------------
 //---------------------------------------------------
 
-//-------------PRINTBUFFER
+//-------------Construire message 2 -----------------
+void construire_message2(char *message, char motif, int lg, int i)
+{
+
+    char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
+    if (i>26)
+        motif=alphabet[i%26-1];
+
+    else
+        motif = alphabet[i - 1];
+
+
+    for (int j=0;j<lg-5;j++)
+    {
+
+        *(message+j+5) = motif;
+    }
+}
+//------------------PRINTBUFFER-----------------------
 void printbuffer(int n)
 {
-    int r;
-
     if (n<10)
     {
         printf("[----%d",n);
@@ -59,9 +78,53 @@ void printbuffer(int n)
         exit(1);
     }
 }
+
+
+//------------------PRINTBUFFER2----------------------
+void printbuffer2(int n , char*message)
+{
+    if (n<10)
+    {
+        for (int i=0 ; i<4 ; i++)
+        {
+            *(message+i)='-';
+        }
+        *(message+4)=n;
+    }
+    if (n>=10 & n<100)
+    {
+        for (int i=0 ; i<3 ; i++)
+        {
+            *(message+i)='-';
+        }
+        *(message+3)=n;
+    }
+    if (n>=100 & n<1000)
+    {
+        printf("[--%d",n);
+    }
+    if (n>=1000 & n<10000)
+    {
+        printf("[--%d",n);
+    }
+    if (n>=10000 & n<100000)
+    {
+        printf("[-%d",n);
+    }
+    if (n>=100000 & n<1000000)
+    {
+        printf("[%d",n);
+    }
+    if (n>=1000000)
+    {
+        printf("Trop de messages à envoyer (n>1000000 \n");
+        exit(1);
+    }
+}
+
 //Construction des messages
 
-void construire_message(char *message, char motif, int lg ,int i)
+void construire_message(char *message, char motif, int lg, int i )
 
 {
 	char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
@@ -130,16 +193,16 @@ void envoi_UDP(int port ,int nb_mess , int lg_msg,char*dest)
       exit(1);
     }
 
-    printf("Après gethostbyname , nb_message= %d\n",nb_mess);
+    //printf("Après gethostbyname , nb_message= %d\n",nb_mess);
       
   	memcpy((char*)&(addr_distant.sin_addr.s_addr), hp->h_addr, hp->h_length);
-  	printf("Association IP OK\n");
-  	printf("Nombre de messages à envoyer : %d\n", nb_mess);
+  	//printf("Association IP OK\n");
+  	//printf("Nombre de messages à envoyer : %d\n", nb_mess);
       
   	for (int i=1; i<=nb_mess ; i++)
     {
     	construire_message(message,'a',lg_msg,i);
-      	printf("SOURCE : Envoi n°%d (%d) ", i, lg_msg);
+      	printf("SOURCE : Envoi n°%d (%d) [", i, lg_msg);
       	
 
       	if((sent=sendto(sock,message,lg_msg,0,(struct sockaddr*)&addr_distant,sizeof(addr_distant)))==-1)   
@@ -147,7 +210,7 @@ void envoi_UDP(int port ,int nb_mess , int lg_msg,char*dest)
       		printf("Erreur sendto\n");
       		exit(1);
       	} 
-      	printbuffer(i);
+      	printbuffer2(i,message);
       	afficher_message(message,sent);
     }
 
@@ -210,7 +273,7 @@ void reception_UDP(int port, int nb_message, int lg_message)
     	else 
 		{
 	 		printf("PUITS : Réception n°%d (%d) :",i,lg_message);
-	 		printbuffer(i);
+	 		//printbuffer(i);
 	  		afficher_message(message,recv);
 		}
     }
@@ -291,7 +354,7 @@ void ClientTCP (int port, int nb_message , int lg_msg , char* dest)
 
 		if ((envoi=write(sock,message,lg_msg/*,0,(struct sockaddr*)&addr_distant,lg_addr_distant)*/))==-1)
 		{
-			printf("Echec de l'envoi du message (fonction send en défaut)\n");
+			printf("Echec de l'envoi du message (fonction write en défaut)\n");
 			exit(1);
 		}
 	}
