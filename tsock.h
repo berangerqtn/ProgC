@@ -47,6 +47,7 @@ void construire_message2(char *message, char motif, int lg, int i)
         *(message+j+5) = motif;
     }
 }
+
 //------------------PRINTBUFFER-----------------------
 void printbuffer(int n)
 {
