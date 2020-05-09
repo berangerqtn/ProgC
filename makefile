@@ -1,3 +1,2 @@
-tsock: tsock_p2.c  tsock.h
-	gcc tsock_p2.c -o tsock_p2 -g
-
+tsock: tsock_vf.c  tsock.h bal.h
+	gcc tsock_vf.c -o tsock -g
